@@ -28,7 +28,7 @@ var levelCoins = {
 function updateHUD(coinText, keysText, timerText, cam) {
     keysText.setPosition(cam.scrollX + 435,cam.scrollY + 245);
     coinText.setPosition(cam.scrollX + 435, cam.scrollY + 260);
-    timerText.setPosition(cam.scrollX + 435, cam.scrollY + 290);
+    timerText.setPosition(cam.scrollX + 435, cam.scrollY + 275);
 }
 
 const game = new Phaser.Game(config);
