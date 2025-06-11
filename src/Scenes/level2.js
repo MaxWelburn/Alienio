@@ -1,4 +1,4 @@
-class Platformer extends Phaser.Scene {
+class Level2 extends Phaser.Scene {
     constructor() {
         super("level2Scene");
     }
@@ -11,10 +11,15 @@ class Platformer extends Phaser.Scene {
         this.PARTICLE_VELOCITY = 50;
         this.SCALE = 3.0;
         this.canDoubleJump = true;
+        //Pause menu
+        this.isPaused = false;
+        this.pauseStartTime = 0;
+        this.pausedDuration = 0;
     }
 
     create() {
         console.log(levelCoins.level2);
+        const { width, height } = this.cameras.main;
         //Level variables
         this.keys = 0;
         this.coins = 0;
@@ -39,9 +44,10 @@ class Platformer extends Phaser.Scene {
         this.coinsLayer = this.map.createLayer("Coins", this.tileset, 0, 0).setDepth(0);
 
         //Player
-        this.player = this.physics.add.sprite(40, 320, "platformer_characters", "tile_0000.png").setDepth(7);
+        this.player = this.physics.add.sprite(40, 334, "platformer_characters", "tile_0000.png").setDepth(7);
         this.player.setCollideWorldBounds(true);
         this.player.setMaxVelocity(180, 350).setDisplaySize(16, 16);
+        this.player.setFlip(true, false);
 
         //Collisions
         this.killPartLayer.setCollisionByExclusion([-1]);
@@ -100,8 +106,47 @@ class Platformer extends Phaser.Scene {
             strokeThickness: 20,
             fontStyle: "bold"
         }).setDepth(2000).setPosition(cam.scrollX, cam.scrollY).setScale(1 / cam.zoom / 3);
+        
+        //Gameplay pause menu
+        this.keyEsc = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
+        this.keyEsc.once('down', () => this.togglePause(), this);
+
+        this.pauseOverlay = this.add.rectangle(0, 0, width, height, 0x000000, 0.5)
+            .setOrigin(0)
+            .setScrollFactor(0)
+            .setDepth(1000)
+            .setVisible(false);
+
+        this.pauseMenu = this.add.container(cam.midPoint.x, cam.midPoint.y).setDepth(1001).setVisible(false);
+        this.resumeBtn = this.add.image(0, -30, 'btnResume')
+            .setInteractive({ useHandCursor: true })
+            .on('pointerup', () => this.togglePause());
+        this.exitBtn = this.add.image(0, 30, 'btnExit')
+            .setInteractive({ useHandCursor: true })
+            .on('pointerup', () => this.scene.start('mainMenuScene'));
+        this.pauseMenu.add([resumeBtn, exitBtn]);
+
         this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {this.runSound.stop()});
-        this.events.on(Phaser.Scenes.Events.POST_UPDATE, () => updateHUD(this.coinText, this.keysText, this.timerText, this.cameras.main), this);
+        this.events.on(Phaser.Scenes.Events.POST_UPDATE, () => updateHUD(this.coinText, this.keysText, this.timerText, this.resumeBtn, this.exitBtn, this.cameras.main), this);
+    }
+
+    //Pauses the game when hitting esc key
+    togglePause() {
+        this.isPaused = !this.isPaused;
+        if (this.isPaused) {
+            this.physics.world.pause();
+            this.runSound.pause();
+            this.pauseStartTime = Date.now();
+            this.pauseOverlay.setVisible(true);
+            this.pauseMenu.setVisible(true);
+        } else {
+            this.physics.world.resume();
+            if (!this.runSound.isPlaying) this.runSound.play();
+            this.pausedDuration += Date.now() - this.pauseStartTime;
+            this.pauseOverlay.setVisible(false);
+            this.pauseMenu.setVisible(false);
+            this.keyEsc.once('down', () => this.togglePause(), this);
+        }
     }
 
     //Kills player and resets scene
@@ -151,9 +196,9 @@ class Platformer extends Phaser.Scene {
         }
     }
 
-    update() {
+    update(time, delta) {
         //Check if game over
-        if (this.endTime != 0) return;
+        if (this.endTime != 0 || this.isPaused) return;
         //Movement input handler
         if (cursors.left.isDown) {
             this.player.setAccelerationX(-this.ACCELERATION);
@@ -205,7 +250,11 @@ class Platformer extends Phaser.Scene {
             this.walking.start();
         }
         //Timer text
-        let elapsed = Math.floor((Date.now() - this.startTime) / 1000);
-        this.timerText.setText("Timer: " + `${String(Math.floor(elapsed / 60)).padStart(2, '0')}:${String(elapsed % 60).padStart(2, '0')}`);
+        const elapsedMS = Date.now() - this.startTime - this.pausedDuration;
+        const totalSec = Math.floor(elapsedMS / 1000);
+        const mins = Math.floor(totalSec / 60);
+        const secs = totalSec % 60;
+        const pad = n => String(n).padStart(2, '0');
+        this.timerText.setText(`${pad(mins)}:${pad(secs)}`);
     }
 }

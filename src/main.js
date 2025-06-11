@@ -13,7 +13,7 @@ let config = {
     },
     width: 1280,
     height: 720,
-    scene: [Load, Platformer]
+    scene: [Load, MainMenu, LevelSelect, Controls, Credits, Level2]
 }
 
 var cursors;
@@ -25,10 +25,12 @@ var levelCoins = {
     level5: 0
 }
 
-function updateHUD(coinText, keysText, timerText, cam) {
-    keysText.setPosition(cam.scrollX + 435,cam.scrollY + 245);
+function updateHUD(coinText, keysText, timerText, resumeBTN, exitBTN, cam) {
+    keysText.setPosition(cam.scrollX + 435, cam.scrollY + 245);
     coinText.setPosition(cam.scrollX + 435, cam.scrollY + 260);
     timerText.setPosition(cam.scrollX + 435, cam.scrollY + 275);
+    resumeBTN.setPosition(cam.scrollX + 435, cam.scrollY + 245);
+    exitBTN.setPosition(cam.scrollX + 435, cam.scrollY + 245);
 }
 
 const game = new Phaser.Game(config);

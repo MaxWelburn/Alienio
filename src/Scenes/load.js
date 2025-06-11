@@ -5,10 +5,20 @@ class Load extends Phaser.Scene {
 
     preload() {
         this.load.setPath("./assets/");
+        //Textures
         this.load.atlas("platformer_characters", "tilemap-characters-packed.png", "tilemap-characters-packed.json");
         this.load.image("tilemap_tiles", "tilemap_packed.png");
         this.load.image("parallaxMap", "parallax.png");
         this.load.tilemapTiledJSON("level1Set", "level1.tmj");
+        //UI
+        this.load.image("creditsPNG", "Alieno_credits.png");
+        this.load.image("titlePNG", "Alieno_Title.png");
+        this.load.image("controlsPNG", "Controlls.png");
+        this.load.image("creditsBTN", "Credits_Button.png");
+        this.load.image("controlsBTN", "Controlls_Button.png");
+        this.load.image("backBTN", "BackButton.png");
+        this.load.image("playBTN", "Play.png");
+        //Audio
         this.load.audio("run", [
             "audio/footstep01.ogg",
             "audio/footstep02.ogg",
@@ -71,7 +81,7 @@ class Load extends Phaser.Scene {
             ],
         });
 
-        this.scene.start("level2Scene");
+        this.scene.start("mainMenuScene");
     }
 
     update() {
