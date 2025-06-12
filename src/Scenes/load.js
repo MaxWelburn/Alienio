@@ -25,7 +25,7 @@ class Load extends Phaser.Scene {
         this.load.image("playBTN", "Play.png");
         this.load.image("resumeBTN", "Resume.png");
         this.load.image("restartBTN", "Restart.png");
-        this.load.image("nextBTN", "level_arrow.png");
+        this.load.image("nextBTN", "Level_arrow.png");
         this.load.image("exitBTN", "level_exit.png");
         this.load.image("level1", "Level_1_block.png");
         this.load.image("level2", "Level_2_block.png");
@@ -35,7 +35,7 @@ class Load extends Phaser.Scene {
         this.load.image("grayKey", "keyGRAY.png");
         this.load.image("colorKey", "keyColor.png");
         this.load.image("pausePNG", "Paused.png");
-        this.load.image("boxPNG", "Box.png");
+        this.load.image("boxPNG", "box.png");
         this.load.image("snowballPNG", "snowball.png");
         //Audio
         this.load.audio("run", [
