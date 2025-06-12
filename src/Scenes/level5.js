@@ -107,53 +107,33 @@ class Level5 extends Phaser.Scene {
             fontStyle: "bold"
         }).setDepth(2000).setPosition(cam.scrollX, cam.scrollY).setScale(1 / cam.zoom / 3);
         
+        //Snowman shoot snowballs every random seconds
+        this.rng = new Phaser.Math.RandomDataGenerator(['1']);
+        this.bullets = this.physics.add.group();
 
+        this.shootingLayer.forEachTile(tile => {
+            if (tile.index !== -1) {
+                const x = tile.getCenterX();
+                const y = tile.getCenterY();
+                const spawnLoop = () => {
+                    const delay = this.rng.realInRange(1500, 4000);
+                    this.time.addEvent({
+                        delay,
+                        callback: () => {
+                            const bullet = this.bullets.create(x, y, 'snowballPNG');
+                            bullet.setVelocityX(-this.rng.realInRange(50, 150));
+                            bullet.body.allowGravity = false;
+                            bullet.setDepth(7);
+                            spawnLoop();
+                        },
+                        callbackScope: this
+                    });
+                };
+                spawnLoop();
+            }
+        });
 
-
-
-
-
-
-
-
-
-
-
-        // //Snowman snowball shoot
-
-        // this.bullets = this.physics.add.group();
-
-        // // Spawn bullets from every shooting tile every 2 seconds
-        // this.time.addEvent({
-        //     delay: 2000,
-        //     callback: () => {
-        //         this.shootingLayer.forEachTile(tile => {
-        //             if (tile.index !== -1) {
-        //                 const x = tile.getCenterX();
-        //                 const y = tile.getCenterY();
-        //                 const bullet = this.bullets.create(x, y, 'bullet');
-        //                 bullet.setVelocityX(-200);
-        //                 bullet.body.AllowGravity = false;
-        //                 bullet.setDepth(7);
-        //             }
-        //         });
-        //     },
-        //     loop: true
-        // });
-
-        // // Check for overlap between player and bullets
-        // this.physics.add.overlap(this.player, this.bullets, this.killPlayer, null, this);
-
-
-
-
-
-
-
-
-
-
-
+        this.physics.add.overlap(this.player, this.bullets, this.killPlayer, null, this);
 
         //Gameplay pause menu
         this.pauseOverlay = this.add.rectangle(0, 0, width, height, 0x000000, 0.5)
