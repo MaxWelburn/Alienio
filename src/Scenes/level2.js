@@ -18,7 +18,6 @@ class Level2 extends Phaser.Scene {
     }
 
     create() {
-        console.log(levelCoins.level2);
         const { width, height } = this.cameras.main;
         //Level variables
         this.keys = 0;
@@ -108,9 +107,6 @@ class Level2 extends Phaser.Scene {
         }).setDepth(2000).setPosition(cam.scrollX, cam.scrollY).setScale(1 / cam.zoom / 3);
         
         //Gameplay pause menu
-        this.keyEsc = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
-        this.keyEsc.once('down', () => this.togglePause(), this);
-
         this.pauseOverlay = this.add.rectangle(0, 0, width, height, 0x000000, 0.5)
             .setOrigin(0)
             .setScrollFactor(0)
@@ -118,16 +114,25 @@ class Level2 extends Phaser.Scene {
             .setVisible(false);
 
         this.pauseMenu = this.add.container(cam.midPoint.x, cam.midPoint.y).setDepth(1001).setVisible(false);
-        this.resumeBtn = this.add.image(0, -30, 'btnResume')
+        this.pauseIMG = this.add.image(180, -50, 'pausePNG');
+        this.resumeBtn = this.add.image(180, -30, 'resumeBTN')
+            .setScale(0.6)
             .setInteractive({ useHandCursor: true })
             .on('pointerup', () => this.togglePause());
-        this.exitBtn = this.add.image(0, 30, 'btnExit')
+        this.restartBtn = this.add.image(180, -10, 'restartBTN')
+            .setScale(0.6)
             .setInteractive({ useHandCursor: true })
-            .on('pointerup', () => this.scene.start('mainMenuScene'));
-        this.pauseMenu.add([resumeBtn, exitBtn]);
+            .on('pointerup', () => this.scene.restart());
+        this.exitBtn = this.add.image(180, 10, 'exitBTN')
+            .setScale(0.6)
+            .setInteractive({ useHandCursor: true })
+            .on('pointerup', () => this.scene.start('levelSelect'));
+        this.pauseMenu.add([this.pauseIMG, this.resumeBtn, this.restartBtn, this.exitBtn]);
 
+        this.input.keyboard.on('keydown-ESC', this.togglePause, this);
+        this.input.keyboard.on('keydown-R', () => this.scene.restart(), this);
         this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {this.runSound.stop()});
-        this.events.on(Phaser.Scenes.Events.POST_UPDATE, () => updateHUD(this.coinText, this.keysText, this.timerText, this.resumeBtn, this.exitBtn, this.cameras.main), this);
+        this.events.on(Phaser.Scenes.Events.POST_UPDATE, () => updateHUD(this.coinText, this.keysText, this.timerText, this.pauseIMG, this.resumeBtn, this.restartBtn, this.exitBtn, this.cameras.main), this);
     }
 
     //Pauses the game when hitting esc key
@@ -145,7 +150,6 @@ class Level2 extends Phaser.Scene {
             this.pausedDuration += Date.now() - this.pauseStartTime;
             this.pauseOverlay.setVisible(false);
             this.pauseMenu.setVisible(false);
-            this.keyEsc.once('down', () => this.togglePause(), this);
         }
     }
 
@@ -178,20 +182,48 @@ class Level2 extends Phaser.Scene {
     //Fires when player touches end flag
     reachFlag(player, tile) {
         if (this.keys == 3) {
-            levelCoins.level2 = this.coins;
-            this.endTime = Math.floor(Date.now());
+            //Check and save data
+            this.endTime = Math.floor(Date.now() - this.startTime - this.pausedDuration) / 1000;
+            const levelStats = window.dataStats.level2;
+            levelStats[0] = this.coins > levelStats[0] ? this.coins : levelStats[0];
+            levelStats[1] = levelStats[1] == 0 ? this.endTime : (this.endTime < levelStats[1] ? this.endTime : levelStats[1]);
+            localStorage.setItem('dataStats', JSON.stringify(window.dataStats));
             this.flagLayer.removeTileAt(tile.x, tile.y, true, true);
             this.physics.pause();
             this.sound.stopAll();
             player.setVelocity(0).anims.stop();
-            this.cameras.main.fadeOut(1000, 0, 0, 0);
-            this.time.delayedCall(1000, () => {
+            this.time.delayedCall(120, () => {
+                //You Win title
+                this.cameras.main.resetFX();
                 this.add.text(
-                    this.cameras.main.midPoint.x,
-                    this.cameras.main.midPoint.y,
+                    this.cameras.main.scrollX + 526,
+                    this.cameras.main.scrollY + 300,
                     'YOU WIN!',
-                    {fontSize: '32px', color: '#ffffff'}
-                ).setOrigin(0.5).setScrollFactor(0);
+                    {fontSize: '200px', fontStyle: 'bold', color: '#ffffff', stroke: '#000000', strokeThickness: 10}
+                ).setDepth(2000).setScale(0.25);
+
+                //All buttons
+                const btnContainer = this.add.container(this.cameras.main.scrollX + 640, this.cameras.main.scrollY + 360).setDepth(2000);
+
+                const nextBtn = this.add.image(0, 0, 'nextBTN')
+                    .setInteractive({ useHandCursor: true })
+                    .on('pointerover', () => nextBtn.setScale(1.1))
+                    .on('pointerout', () => nextBtn.setScale(1))
+                    .on('pointerup', () => this.scene.start('level3Scene'));
+
+                const restartBtn = this.add.image(0, 30, 'restartBTN')
+                    .setInteractive({ useHandCursor: true })
+                    .on('pointerover', () => restartBtn.setScale(1.1))
+                    .on('pointerout', () => restartBtn.setScale(1))
+                    .on('pointerup', () => this.scene.restart());
+
+                const exitBtn = this.add.image(0, 60, 'exitBTN')
+                    .setInteractive({ useHandCursor: true })
+                    .on('pointerover', () => exitBtn.setScale(1.1))
+                    .on('pointerout', () => exitBtn.setScale(1))
+                    .on('pointerup', () => this.scene.start('levelSelect'));
+
+                btnContainer.add([ nextBtn, restartBtn, exitBtn ]);
             });
         }
     }

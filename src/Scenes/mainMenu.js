@@ -21,18 +21,18 @@ class MainMenu extends Phaser.Scene {
         };
 
         // Play Button
-        const playButton = this.add.image(width / 2, height * 0.45, 'playBTN')
+        const playButton = this.add.image(width / 2, height * 0.5, 'playBTN')
             .setOrigin(0.5)
-            .setScale(3)
+            .setScale(4)
             .setInteractive({ useHandCursor: true })
-            .on('pointerover', () => playButton.setScale(3.1))
-            .on('pointerout', () => playButton.setScale(3))
+            .on('pointerover', () => playButton.setScale(4.1))
+            .on('pointerout', () => playButton.setScale(4))
             .on('pointerup', () => {
                 this.scene.start('levelSelect');
             });
 
         // Controls Button
-        const controlsButton = this.add.image(width / 2, height * 0.575, 'controlsBTN')
+        const controlsButton = this.add.image(width / 2, height * 0.65, 'controlsBTN')
             .setOrigin(0.5)
             .setScale(3)
             .setInteractive({ useHandCursor: true })
@@ -43,7 +43,7 @@ class MainMenu extends Phaser.Scene {
             });
 
         // Credits Button
-        const creditsButton = this.add.image(width / 2, height * 0.7, 'creditsBTN')
+        const creditsButton = this.add.image(width / 2, height * 0.78, 'creditsBTN')
             .setOrigin(0.5)
             .setScale(3)
             .setInteractive({ useHandCursor: true })
