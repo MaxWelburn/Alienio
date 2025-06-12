@@ -7,6 +7,7 @@ class LevelSelect extends Phaser.Scene {
         const { width, height } = this.cameras.main;
         this.add.image(width / 2, height / 2, "levelsPNG").setDisplaySize(width, height).setOrigin(0.5);
 
+        //Back button
         const backButton = this.add.image(70, height - 35, 'backBTN')
             .setScale(2)
             .setInteractive({ useHandCursor: true })
@@ -16,7 +17,7 @@ class LevelSelect extends Phaser.Scene {
                 this.scene.start('mainMenuScene');
         });
 
-        const timeStyle = {
+        const timerStyle = {
             fontFamily: 'Arial',
             fontSize: '200px',
             color: '#FFFFFF',
@@ -25,6 +26,7 @@ class LevelSelect extends Phaser.Scene {
             fontStyle: 'bold'
         };
 
+        //Stored player level data
         const storedData = localStorage.getItem('dataStats');
         window.dataStats = storedData ? JSON.parse(storedData) : defaultStats;
 
@@ -53,11 +55,10 @@ class LevelSelect extends Phaser.Scene {
 
             //Time display
             if (levelStats[0] > 0) {
-                console.log(levelStats);
                 const seconds = Math.floor(levelStats[1]);
                 const ms = Math.floor((levelStats[1] - seconds) * 1000);
                 const timeStr = `${String(seconds).padStart(2, '0')}:${String(ms).padStart(2, '0')}`;
-                this.add.text(xPos, height * 0.5 + 100 / 2 + 80, timeStr, timeStyle).setOrigin(0.5).setScale(0.18);
+                this.add.text(xPos, height * 0.5 + 100 / 2 + 80, timeStr, timerStyle).setOrigin(0.5).setScale(0.18);
             }
         }
     }

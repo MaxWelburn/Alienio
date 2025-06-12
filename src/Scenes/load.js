@@ -9,8 +9,11 @@ class Load extends Phaser.Scene {
         this.load.atlas("platformer_characters", "tilemap-characters-packed.png", "tilemap-characters-packed.json");
         this.load.image("tilemap_tiles", "tilemap_packed.png");
         this.load.image("parallaxMap", "parallax.png");
-        this.load.tilemapTiledJSON("level1Set", "level1.tmj");
-        this.load.tilemapTiledJSON("level2Set", "level2.tmj");
+        this.load.tilemapTiledJSON("level1Set", "level2.tmj");
+        this.load.tilemapTiledJSON("level2Set", "level1.tmj");
+        this.load.tilemapTiledJSON("level3Set", "level3.tmj");
+        this.load.tilemapTiledJSON("level4Set", "level4.tmj");
+        this.load.tilemapTiledJSON("level5Set", "level5.tmj");
         //UI
         this.load.image("levelsPNG", "Levels.png");
         this.load.image("creditsPNG", "Alieno_credits.png");
@@ -32,6 +35,8 @@ class Load extends Phaser.Scene {
         this.load.image("grayKey", "keyGRAY.png");
         this.load.image("colorKey", "keyColor.png");
         this.load.image("pausePNG", "Paused.png");
+        this.load.image("boxPNG", "Box.png");
+        this.load.image("snowballPNG", "snowball.png");
         //Audio
         this.load.audio("run", [
             "audio/footstep01.ogg",

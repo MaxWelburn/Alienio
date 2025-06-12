@@ -22,14 +22,14 @@ class Level2 extends Phaser.Scene {
         //Level variables
         this.keys = 0;
         this.coins = 0;
-        this.startTime = Math.floor(Date.now());
+        this.startTime = 0;
         this.endTime = 0;
         this.physics.world.drawDebug = false
         this.physics.world.debugGraphic.clear()
         cursors = this.input.keyboard.createCursorKeys();
 
         //Map
-        this.map = this.add.tilemap("level1Set", 18, 18, 0, 0);
+        this.map = this.add.tilemap("level2Set", 18, 18, 0, 0);
         this.tileset = this.map.addTilesetImage("set1", "tilemap_tiles");
         this.parallax = this.add.image(0, 0, "parallaxMap").setDepth(-1).setOrigin(0).setScale(0.75).setScrollFactor(0.25);
         
@@ -115,18 +115,7 @@ class Level2 extends Phaser.Scene {
 
         this.pauseMenu = this.add.container(cam.midPoint.x, cam.midPoint.y).setDepth(1001).setVisible(false);
         this.pauseIMG = this.add.image(180, -50, 'pausePNG');
-        this.resumeBtn = this.add.image(180, -30, 'resumeBTN')
-            .setScale(0.6)
-            .setInteractive({ useHandCursor: true })
-            .on('pointerup', () => this.togglePause());
-        this.restartBtn = this.add.image(180, -10, 'restartBTN')
-            .setScale(0.6)
-            .setInteractive({ useHandCursor: true })
-            .on('pointerup', () => this.scene.restart());
-        this.exitBtn = this.add.image(180, 10, 'exitBTN')
-            .setScale(0.6)
-            .setInteractive({ useHandCursor: true })
-            .on('pointerup', () => this.scene.start('levelSelect'));
+        this.menuHUD();
         this.pauseMenu.add([this.pauseIMG, this.resumeBtn, this.restartBtn, this.exitBtn]);
 
         this.input.keyboard.on('keydown-ESC', this.togglePause, this);
@@ -233,6 +222,7 @@ class Level2 extends Phaser.Scene {
         if (this.endTime != 0 || this.isPaused) return;
         //Movement input handler
         if (cursors.left.isDown) {
+            if (this.startTime == 0) this.startTime = Math.floor(Date.now());
             this.player.setAccelerationX(-this.ACCELERATION);
             this.player.resetFlip();
             this.player.anims.play('walk', true);
@@ -246,6 +236,7 @@ class Level2 extends Phaser.Scene {
                 if (this.runSound.isPlaying) this.runSound.stop();
             }
         } else if (cursors.right.isDown) {
+            if (this.startTime == 0) this.startTime = Math.floor(Date.now());
             this.player.setAccelerationX(this.ACCELERATION);
             this.player.setFlip(true, false);
             this.player.anims.play('walk', true);
@@ -272,6 +263,7 @@ class Level2 extends Phaser.Scene {
             this.canDoubleJump = true;
         }
         if (Phaser.Input.Keyboard.JustDown(cursors.up) && this.canDoubleJump) {
+            if (this.startTime == 0) this.startTime = Math.floor(Date.now());
             this.player.body.setVelocityY(this.JUMP_VELOCITY);
             if (!this.player.body.blocked.down) {
                 this.canDoubleJump = false;
@@ -282,7 +274,7 @@ class Level2 extends Phaser.Scene {
             this.walking.start();
         }
         //Timer text
-        const elapsedMS = Date.now() - this.startTime - this.pausedDuration;
+        const elapsedMS = Date.now() - (this.startTime == 0 ? Date.now() : this.startTime - this.pausedDuration);
         const totalSec = Math.floor(elapsedMS / 1000);
         const mins = Math.floor(totalSec / 60);
         const secs = totalSec % 60;
