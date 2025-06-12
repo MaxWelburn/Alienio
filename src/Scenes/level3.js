@@ -87,18 +87,14 @@ class Level3 extends Phaser.Scene {
             alpha: {start: 1, end: 0.1}, 
         });
 
-        this.boxesGroup = this.physics.add.group({ 
-            allowGravity: false,   // so they don’t fall
-            immovable: true        // until we push them
-        });
-
-
-
-
         //Box mechanic
+        this.boxesGroup = this.physics.add.group({ 
+            allowGravity: false,
+            immovable: true
+        });
+        
         this.boxesLayer.forEachTile(tile => {
             if (tile.properties?.isMove) {
-                const frame = tile.index;// - this.tileset.firstgid;
                 const x = tile.getCenterX();
                 const y = tile.getCenterY();
                 const box = this.boxesGroup.create(x, y, 'boxPNG')
@@ -109,14 +105,9 @@ class Level3 extends Phaser.Scene {
                 this.boxesLayer.removeTileAt(tile.x, tile.y);
             }
         });
-        this.physics.add.collider(this.player,       this.boxesGroup, this.pushBox,       null, this);
-        this.physics.add.collider(this.boxesGroup,   this.groundLayer);
-
+        this.physics.add.collider(this.player, this.boxesGroup, this.pushBox, null, this);
+        this.physics.add.collider(this.boxesGroup, this.groundLayer);
         this.boxesGroup?.children.iterate(box => box.setCollideWorldBounds(true));
-
-
-
-
 
         //GUI
         const cam = this.cameras.main;
